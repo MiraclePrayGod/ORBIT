@@ -1,27 +1,24 @@
 package com.orbit.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import com.orbit.ui.theme.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,17 +26,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.orbit.data.entity.OrderStatus
-import com.orbit.data.entity.PaymentMethod
-import com.orbit.ui.components.OrderCard
-import com.orbit.ui.components.QuickActionButton
-import com.orbit.ui.components.SummaryCard
 import com.orbit.ui.components.DateSelector
+import com.orbit.ui.components.OrderCard
 import com.orbit.ui.viewmodel.HomeViewModel
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
- 
 
+/**
+ * Pantalla principal de la aplicación Orbit
+ * Muestra resumen de pedidos, acciones rápidas y lista de pedidos recientes
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -56,199 +51,55 @@ fun HomeScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        contentPadding = PaddingValues(top = 24.dp, bottom = 20.dp)
+            .background(Color.White)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(horizontal = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 20.dp)
     ) {
-        // Header
+        // Header con título y botones de acción
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Orbit",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFF1D1D1F),
-                    letterSpacing = (-0.5).sp
-                )
-                
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    IconButton(
-                        onClick = { /* Settings */ },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                Color(0xFFF8F9FA),
-                                CircleShape
-                            )
-                    ) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "Más opciones",
-                            tint = Color(0xFF8E8E93),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = onAddOrderClick,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                Color(0xFF007AFF),
-                                CircleShape
-                            )
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = "Agregar",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
+            HomeHeader(
+                onAddOrderClick = onAddOrderClick
+            )
         }
         
-        // Summary Cards
+        // Tarjetas de resumen (Pedidos de hoy y Venta Total)
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                AppleSummaryCard(
-                    title = "Pedidos de hoy",
-                    value = uiState.todayOrdersCount.toString(),
-                    icon = Icons.Default.LocalShipping,
-                    iconColor = Color(0xFF4CAF50),
-                    modifier = Modifier.weight(1f),
-                    isAmountVisible = isOrdersVisible,
-                    onEyeClick = { isOrdersVisible = !isOrdersVisible }
-                )
-                
-                AppleSummaryCard(
-                    title = "Venta Total",
-                    value = "$${String.format("%.2f", uiState.todaySales)}",
-                    icon = Icons.Default.AttachMoney,
-                    iconColor = Color(0xFF9C27B0),
-                    modifier = Modifier.weight(1f),
-                    isAmountVisible = isSalesVisible,
-                    onEyeClick = { isSalesVisible = !isSalesVisible }
-                )
-            }
+            SummaryCardsSection(
+                uiState = uiState,
+                isOrdersVisible = isOrdersVisible,
+                isSalesVisible = isSalesVisible,
+                onOrdersVisibilityToggle = { isOrdersVisible = !isOrdersVisible },
+                onSalesVisibilityToggle = { isSalesVisible = !isSalesVisible }
+            )
         }
         
-        // Quick Actions
+        // Botones de acción rápida
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                AppleActionButton(
-                    title = "Pedidos",
-                    icon = Icons.Default.ShoppingCart,
-                    iconColor = Color(0xFF2196F3),
-                    onClick = onOrdersClick,
-                    modifier = Modifier.weight(1f)
-                )
-                
-                AppleActionButton(
-                    title = "Inventario",
-                    icon = Icons.Default.Inventory,
-                    iconColor = Color(0xFFFF9800),
-                    onClick = onInventoryClick,
-                    modifier = Modifier.weight(1f)
-                )
-                
-                AppleActionButton(
-                    title = "Mapa",
-                    icon = Icons.Default.LocationOn,
-                    iconColor = Color(0xFF4CAF50),
-                    onClick = { /* Mapa */ },
-                    modifier = Modifier.weight(1f)
-                )
-                
-                AppleActionButton(
-                    title = "Reportes",
-                    icon = Icons.Default.BarChart,
-                    iconColor = Color(0xFF9C27B0),
-                    onClick = { /* Reporte */ },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            QuickActionsSection(
+                onOrdersClick = onOrdersClick,
+                onInventoryClick = onInventoryClick
+            )
         }
         
-        // Date Selector
+        // Selector de fechas
         item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(
-                        elevation = 6.dp,
-                        shape = RoundedCornerShape(16.dp),
-                        spotColor = Color(0xFF000000),
-                        ambientColor = Color(0xFF000000)
-                    ),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                DateSelector(
-                    selectedDate = selectedDate,
-                    onDateSelected = { selectedDate = it },
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-            }
+            DateSelectorCard(
+                selectedDate = selectedDate,
+                onDateSelected = { selectedDate = it }
+            )
         }
         
-        // Recent Orders Header
+        // Título de pedidos recientes
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Pedidos recientes",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.W600,
-                    color = Color(0xFF1D1D1F),
-                    letterSpacing = (-0.3).sp
-                )
-                
-                IconButton(
-                    onClick = { /* Calendar */ },
-                    modifier = Modifier
-                        .size(36.dp)
-                        .background(
-                            Color(0xFFF2F2F7),
-                            CircleShape
-                        )
-                ) {
-                    Icon(
-                        Icons.Default.CalendarToday,
-                        contentDescription = "Calendario",
-                        tint = Color(0xFF8E8E93),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
+            RecentOrdersHeader()
         }
         
-        // Orders List
+        // Lista de pedidos recientes
         if (uiState.isLoading) {
             item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = Color(0xFF2196F3))
-                }
+                LoadingIndicator()
             }
         } else {
             items(uiState.recentOrders) { orderWithDetails ->
@@ -259,17 +110,220 @@ fun HomeScreen(
             }
         }
         
-        // Extra padding at the end to ensure full scroll
+        // Espaciado final
         item {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
 
-
-// Apple Design Components
+/**
+ * Header de la pantalla con título y botones de acción
+ */
 @Composable
-private fun AppleSummaryCard(
+private fun HomeHeader(
+    onAddOrderClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Orbit",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.W600,
+            color = Color(0xFF1D1D1F),
+            letterSpacing = (-0.5).sp
+        )
+        
+        // Botón de agregar pedido
+        Box(
+            modifier = Modifier
+                .size(35.dp)
+                .background(
+                    Color(0xFF007AFF),
+                    CircleShape
+                )
+                .clickable { onAddOrderClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Default.Add,
+                contentDescription = "Agregar",
+                tint = Color.White,
+                modifier = Modifier.size(15.dp)
+            )
+        }
+    }
+}
+
+/**
+ * Sección de tarjetas de resumen (Pedidos de hoy y Venta Total)
+ */
+@Composable
+private fun SummaryCardsSection(
+    uiState: com.orbit.ui.viewmodel.HomeUiState,
+    isOrdersVisible: Boolean,
+    isSalesVisible: Boolean,
+    onOrdersVisibilityToggle: () -> Unit,
+    onSalesVisibilityToggle: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        SummaryCard(
+            title = "Pedidos de hoy",
+            value = uiState.todayOrdersCount.toString(),
+            icon = Icons.Default.LocalShipping,
+            iconColor = Color(0xFF4CAF50),
+            modifier = Modifier.weight(1f),
+            isAmountVisible = isOrdersVisible,
+            onEyeClick = onOrdersVisibilityToggle
+        )
+        
+        SummaryCard(
+            title = "Venta Total",
+            value = "$${String.format("%.2f", uiState.todaySales)}",
+            icon = Icons.Default.MonetizationOn,
+            iconColor = Color(0xFF9C27B0),
+            modifier = Modifier.weight(1f),
+            isAmountVisible = isSalesVisible,
+            onEyeClick = onSalesVisibilityToggle
+        )
+    }
+}
+
+/**
+ * Sección de botones de acción rápida
+ */
+@Composable
+private fun QuickActionsSection(
+    onOrdersClick: () -> Unit,
+    onInventoryClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        QuickActionButton(
+            title = "Pedidos",
+            icon = Icons.Default.ShoppingCart,
+            iconColor = Color(0xFF2196F3),
+            onClick = onOrdersClick,
+            modifier = Modifier.weight(1f)
+        )
+        
+        QuickActionButton(
+            title = "Inventario",
+            icon = Icons.Default.Inventory,
+            iconColor = Color(0xFFFF9800),
+            onClick = onInventoryClick,
+            modifier = Modifier.weight(1f)
+        )
+        
+        QuickActionButton(
+            title = "Mapa",
+            icon = Icons.Default.LocationOn,
+            iconColor = Color(0xFF4CAF50),
+            onClick = { /* Mapa */ },
+            modifier = Modifier.weight(1f)
+        )
+        
+        QuickActionButton(
+            title = "Reportes",
+            icon = Icons.Default.BarChart,
+            iconColor = Color(0xFF9C27B0),
+            onClick = { /* Reporte */ },
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+/**
+ * Tarjeta contenedora del selector de fechas
+ */
+@Composable
+private fun DateSelectorCard(
+    selectedDate: LocalDate,
+    onDateSelected: (LocalDate) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = Color(0xFF000000),
+                ambientColor = Color(0xFF000000)
+            ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        DateSelector(
+            selectedDate = selectedDate,
+            onDateSelected = onDateSelected,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+    }
+}
+
+/**
+ * Header de la sección de pedidos recientes
+ */
+@Composable
+private fun RecentOrdersHeader() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Pedidos recientes",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.W600,
+            color = Color(0xFF1D1D1F),
+            letterSpacing = (-0.3).sp
+        )
+        
+        IconButton(
+            onClick = { /* Calendar */ },
+            modifier = Modifier
+                .size(36.dp)
+                .background(
+                    Color(0xFFF2F2F7),
+                    CircleShape
+                )
+        ) {
+            Icon(
+                Icons.Default.CalendarToday,
+                contentDescription = "Calendario",
+                tint = Color(0xFF8E8E93),
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
+/**
+ * Indicador de carga
+ */
+@Composable
+private fun LoadingIndicator() {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = Color(0xFF2196F3))
+    }
+}
+
+/**
+ * Tarjeta de resumen con icono, valor y botón de visibilidad
+ */
+@Composable
+private fun SummaryCard(
     title: String,
     value: String,
     icon: ImageVector,
@@ -280,7 +334,7 @@ private fun AppleSummaryCard(
 ) {
     Card(
         modifier = modifier
-            .height(110.dp)
+            .height(90.dp)
             .shadow(
                 elevation = 12.dp,
                 shape = RoundedCornerShape(22.dp),
@@ -293,21 +347,21 @@ private fun AppleSummaryCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
+                .padding(10.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Top row with icon, value and eye icon (TODO EN UNA LÍNEA)
+            // Fila superior con icono, valor y botón de ojo
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left: Icon with strong background
+                // Icono con fondo - primero
                 Box(
                     modifier = Modifier
-                        .size(50.dp)
+                        .size(32.dp)
                         .background(
-                            iconColor.copy(alpha = 0.1f),
+                            iconColor.copy(alpha = 0.15f),
                             RoundedCornerShape(12.dp)
                         ),
                     contentAlignment = Alignment.Center
@@ -316,20 +370,24 @@ private fun AppleSummaryCard(
                         imageVector = icon,
                         contentDescription = null,
                         tint = iconColor,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                 }
 
-                // Center: Value (oculto o visible)
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Valor (visible u oculto) - centrado
                 Text(
                     text = if (isAmountVisible) value else "••••",
-                    fontSize = 24.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.W600,
                     color = Color(0xFF1D1D1F),
                     letterSpacing = (-0.5).sp
                 )
 
-                // Right: Eye icon (clickeable)
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Botón de ojo (clickeable) - al final
                 IconButton(
                     onClick = onEyeClick,
                     modifier = Modifier.size(20.dp)
@@ -343,7 +401,7 @@ private fun AppleSummaryCard(
                 }
             }
 
-            // Bottom: Title
+            // Título centrado en la parte inferior
             Text(
                 text = title,
                 fontSize = 15.sp,
@@ -356,9 +414,11 @@ private fun AppleSummaryCard(
     }
 }
 
-
+/**
+ * Botón de acción rápida con icono y texto
+ */
 @Composable
-private fun AppleActionButton(
+private fun QuickActionButton(
     title: String,
     icon: ImageVector,
     iconColor: Color,
@@ -367,33 +427,36 @@ private fun AppleActionButton(
 ) {
     Card(
         modifier = modifier
-            .height(90.dp)
+            .fillMaxWidth()
+            .height(76.dp)
             .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(18.dp),
+                elevation = 6.dp,
+                shape = RoundedCornerShape(14.dp),
                 spotColor = Color(0xFF000000),
                 ambientColor = Color(0xFF000000)
             ),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = onClick
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Ícono LIBRE, sin fondo de color
+            // Icono
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = iconColor,
                 modifier = Modifier.size(32.dp)
             )
+            
             Spacer(modifier = Modifier.height(8.dp))
-            // Título debajo del ícono (como en la segunda imagen)
+            
+            // Título
             Text(
                 text = title,
                 fontSize = 13.sp,
@@ -405,10 +468,8 @@ private fun AppleActionButton(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     HomeScreen()
 }
-
