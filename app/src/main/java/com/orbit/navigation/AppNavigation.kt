@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.orbit.ui.map.PanamaMapScreen
 import com.orbit.ui.screens.HomeScreen
 import com.orbit.ui.screens.OrdersScreen
 import com.orbit.ui.screens.InventoryScreen
@@ -29,6 +30,9 @@ fun AppNavigation(
                 },
                 onAddOrderClick = {
                     navController.navigate("new_order")
+                },
+                onMapClick = {
+                    navController.navigate("panama_map")
                 }
             )
         }
@@ -40,6 +44,9 @@ fun AppNavigation(
                 },
                 onOrderClick = { orderWithDetails ->
                     navController.navigate("order_detail/${orderWithDetails.order.id}")
+                },
+                onMapClick = {
+                    navController.navigate("panama_map")
                 }
             )
         }
@@ -69,7 +76,10 @@ fun AppNavigation(
                 }
             )
         }
-        
+        composable("panama_map") {
+            PanamaMapScreen()
+        }
+
     }
 }
 
