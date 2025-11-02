@@ -91,3 +91,6 @@ La aplicación recrea fielmente el diseño original mostrado en la captura de pa
 ---
 
 **Desarrollado con ❤️ usando Jetpack Compose y Kotlin**
+
+
+Dan Mayhuire
