@@ -28,12 +28,11 @@ class MainActivity : ComponentActivity() {
         
         // Hacer que la app use toda la pantalla sin barras del sistema
         enableEdgeToEdge()
-        
         setContent {
             OrbitTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFFF8F9FA)
+                    color = Color(0xFFFFFFFF)
                 ) {
                     AppNavigation()
                 }

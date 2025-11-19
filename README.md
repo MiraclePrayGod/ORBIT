@@ -49,6 +49,23 @@ La aplicación sigue un diseño **estilo Apple** con:
 - Iconografía simple y reconocible
 - Jerarquía visual clara
 
+### Sistema de Elevación de Tarjetas
+
+Las tarjetas utilizan el sistema `.shadow()` de Compose para crear un efecto de elevación visual, dando la sensación de que están "flotando" sobre el fondo. Los valores de elevación son:
+
+| Componente | Elevación | Descripción |
+|------------|-----------|-------------|
+| **SummaryCard** | `7.dp` | Tarjetas de resumen (Pedidos de hoy, Venta Total) |
+| **OrderCard** | `9.dp` | Tarjetas de pedidos recientes (más elevadas para destacar) |
+| **OrderCardCompact** | `7.dp` | Versión compacta de las tarjetas de pedidos |
+| **QuickActionButton** | `7.dp` | Botones de acción rápida |
+| **DateSelectorCard** | `6.dp` | Selector de fechas (más sutil) |
+
+Todas las tarjetas usan:
+- `spotColor` y `ambientColor` en negro (`Color(0xFF000000)`) para sombras definidas
+- `elevation = 0.dp` en Material 3 para usar solo el sistema `.shadow()` personalizado
+- Formas redondeadas consistentes con el diseño estilo Apple
+
 ## 🚀 Cómo Ejecutar
 
 1. Abre el proyecto en **Android Studio**

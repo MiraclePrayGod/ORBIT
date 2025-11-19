@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 object HomeColors {
     // Base
-    val Background = Color.White
+    val Background = Color.Transparent
     val TextPrimary = Color(0xFF1D1D1F)
     val TextSecondary = Color(0xFF3A3A3C)
     val TextTertiary = Color(0xFF8E8E93)

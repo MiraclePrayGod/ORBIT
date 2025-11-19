@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,15 +23,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.orbit.ui.components.DateSelectorCard
 import com.orbit.ui.components.OrderCard
-import com.orbit.ui.components.SummaryCard
 import com.orbit.ui.components.QuickActionsSection
 import com.orbit.ui.components.RecentOrdersHeader
 import com.orbit.ui.components.LoadingIndicator
+import com.orbit.ui.components.SummaryCard
 import com.orbit.ui.viewmodel.HomeViewModel
 import com.orbit.ui.theme.HomeColors
 import com.orbit.ui.theme.HomeStrings
-import com.orbit.ui.theme.cupertinoCardShadow
-import java.time.LocalDate
+import com.orbit.ui.theme.HomeDimens
 
 /**
  * Pantalla principal de la aplicación Orbit
@@ -43,19 +41,18 @@ import java.time.LocalDate
 fun HomeScreen(
     onOrdersClick: () -> Unit = {},
     onInventoryClick: () -> Unit = {},
-    onAddOrderClick: () -> Unit = {},
     onMapClick: () -> Unit = {},
+    onAddOrderClick: () -> Unit = {},
+    onOrderClick: (Long) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var isOrdersVisible by remember { mutableStateOf(true) }
-    var isSalesVisible by remember { mutableStateOf(true) }
     val uiState by viewModel.uiState.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFFFFF))
+            .background(HomeColors.Background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -70,20 +67,17 @@ fun HomeScreen(
         
         // Tarjetas de resumen (Pedidos de hoy y Venta Total)
         item {
-            SummaryCardsSection(
-                uiState = uiState,
-                isOrdersVisible = isOrdersVisible,
-                isSalesVisible = isSalesVisible,
-                onOrdersVisibilityToggle = { isOrdersVisible = !isOrdersVisible },
-                onSalesVisibilityToggle = { isSalesVisible = !isSalesVisible }
-            )
+            SummaryCardsSection(uiState = uiState)
         }
+        
+        // Smart Stack con widgets adicionales
+
         
         // Botones de acción rápida
         item { QuickActionsSection(onOrdersClick, onInventoryClick, onMapClick) }
         
         // Selector de fechas
-        item { DateSelectorCard(selectedDate, onDateSelected = { selectedDate = it }) }
+        item { DateSelectorCard(selectedDate, onDateSelected = { viewModel.setSelectedDate(it) }) }
         
         // Título de pedidos recientes
         item { RecentOrdersHeader() }
@@ -95,7 +89,7 @@ fun HomeScreen(
             items(uiState.recentOrders) { orderWithDetails ->
                 OrderCard(
                     orderWithDetails = orderWithDetails,
-                    onClick = { /* Navigate to order detail */ }
+                    onClick = { onOrderClick(orderWithDetails.order.id) }
                 )
             }
         }
@@ -132,7 +126,7 @@ private fun HomeHeader(
             modifier = Modifier
                 .size(35.dp)
                 .background(
-                    Color(0xFF007AFF),
+                    HomeColors.Blue,
                     CircleShape
                 )
                 .clickable { onAddOrderClick() },
@@ -153,34 +147,26 @@ private fun HomeHeader(
  */
 @Composable
 private fun SummaryCardsSection(
-    uiState: com.orbit.ui.viewmodel.HomeUiState,
-    isOrdersVisible: Boolean,
-    isSalesVisible: Boolean,
-    onOrdersVisibilityToggle: () -> Unit,
-    onSalesVisibilityToggle: () -> Unit
+    uiState: com.orbit.ui.viewmodel.HomeUiState
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(24.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         SummaryCard(
             title = HomeStrings.OrdersToday,
             value = uiState.todayOrdersCount.toString(),
             icon = Icons.Default.DirectionsCar,
-            iconColor = Color(0xFF4CAF50),
-            modifier = Modifier.weight(1f),
-            isAmountVisible = isOrdersVisible,
-            onEyeClick = onOrdersVisibilityToggle
+            iconColor = HomeColors.Green,
+            modifier = Modifier.weight(1f)
         )
 
         SummaryCard(
             title = HomeStrings.TotalSales,
             value = "$${String.format("%.2f", uiState.todaySales)}",
             icon = Icons.Default.MonetizationOn,
-            iconColor = Color(0xFF9C27B0),
-            modifier = Modifier.weight(1f),
-            isAmountVisible = isSalesVisible,
-            onEyeClick = onSalesVisibilityToggle
+            iconColor = HomeColors.Purple,
+            modifier = Modifier.weight(1f)
         )
     }
 }

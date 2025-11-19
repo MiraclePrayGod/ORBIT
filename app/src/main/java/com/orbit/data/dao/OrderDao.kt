@@ -46,5 +46,8 @@ interface OrderDao {
     
     @Query("UPDATE orders SET status = :status, updatedAt = :timestamp WHERE id = :orderId")
     suspend fun updateOrderStatus(orderId: Long, status: OrderStatus, timestamp: Long = System.currentTimeMillis())
+    
+    @Query("SELECT COUNT(*) FROM orders")
+    suspend fun getOrderCount(): Int
 }
 

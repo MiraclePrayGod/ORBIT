@@ -16,9 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.orbit.data.entity.Product
-import com.orbit.ui.components.ProfessionalButton
-import com.orbit.ui.components.ButtonVariant
-import com.orbit.ui.components.ButtonSize
+import com.orbit.ui.components.AppleButton
+import com.orbit.ui.components.AppleButtonVariant
+import com.orbit.ui.components.AppleButtonSize
+import com.orbit.ui.components.IconPosition
 import com.orbit.ui.theme.*
 
 @Composable
@@ -43,13 +44,14 @@ fun ProductsStep(
         )
         
         // Add Product Button
-        ProfessionalButton(
+        AppleButton(
             text = "Agregar Producto",
             onClick = onAddProduct,
             modifier = Modifier.fillMaxWidth(),
-            variant = ButtonVariant.Success,
-            size = ButtonSize.Large,
-            leadingIcon = Icons.Default.Add
+            variant = AppleButtonVariant.SUCCESS,
+            size = AppleButtonSize.LARGE,
+            icon = Icons.Default.Add,
+            iconPosition = IconPosition.START
         )
         
         // Products List

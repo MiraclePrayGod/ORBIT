@@ -33,23 +33,9 @@ class NewOrderViewModel @Inject constructor(
             initialValue = emptyList()
         )
     
-    fun setSelectedClient(client: Client?) {
-        _uiState.value = _uiState.value.copy(selectedClient = client)
-    }
-    
-    fun clearSelectedClient() {
-        _uiState.value = _uiState.value.copy(selectedClient = null)
-    }
     
     fun addProductToOrder(product: Product, quantity: Int) {
-        // Validar stock antes de agregar
-        if (product.availableQuantity < quantity) {
-            _uiState.value = _uiState.value.copy(
-                error = "Stock insuficiente para ${product.name}. Disponible: ${product.availableQuantity}, Solicitado: $quantity"
-            )
-            return
-        }
-        
+        // Validación básica de UI (cantidad > 0)
         if (quantity <= 0) {
             _uiState.value = _uiState.value.copy(
                 error = "La cantidad debe ser mayor a 0"
@@ -60,15 +46,22 @@ class NewOrderViewModel @Inject constructor(
         val currentItems = _uiState.value.orderItems.toMutableList()
         val existingItemIndex = currentItems.indexOfFirst { it.first.id == product.id }
         
+        val newQuantity = if (existingItemIndex >= 0) {
+            currentItems[existingItemIndex].second + quantity
+        } else {
+            quantity
+        }
+        
+        // Validar stock (validación de negocio)
+        if (product.availableQuantity < newQuantity) {
+            _uiState.value = _uiState.value.copy(
+                error = "Stock insuficiente para ${product.name}. Disponible: ${product.availableQuantity}, Solicitado: $newQuantity"
+            )
+            return
+        }
+        
+        // Actualizar items
         if (existingItemIndex >= 0) {
-            val newQuantity = currentItems[existingItemIndex].second + quantity
-            // Validar stock total
-            if (product.availableQuantity < newQuantity) {
-                _uiState.value = _uiState.value.copy(
-                    error = "Stock insuficiente para ${product.name}. Disponible: ${product.availableQuantity}, Total solicitado: $newQuantity"
-                )
-                return
-            }
             currentItems[existingItemIndex] = product to newQuantity
         } else {
             currentItems.add(product to quantity)

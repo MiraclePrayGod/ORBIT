@@ -22,6 +22,7 @@ object DatabaseModule {
         return OrbitDatabase.getDatabase(context)
     }
     
+    // DAO providers - necesarios para inyección de dependencias
     @Provides
     fun provideClientDao(database: OrbitDatabase): ClientDao = database.clientDao()
     
@@ -41,6 +42,9 @@ object DatabaseModule {
     fun provideInstallmentDao(database: OrbitDatabase): InstallmentDao = database.installmentDao()
     
     @Provides
+    fun provideInventoryMovementDao(database: OrbitDatabase): InventoryMovementDao = database.inventoryMovementDao()
+    
+    @Provides
     @Singleton
     fun provideOrbitRepository(
         clientDao: ClientDao,
@@ -48,7 +52,8 @@ object DatabaseModule {
         orderDao: OrderDao,
         orderItemDao: OrderItemDao,
         paymentDao: PaymentDao,
-        installmentDao: InstallmentDao
+        installmentDao: InstallmentDao,
+        inventoryMovementDao: InventoryMovementDao
     ): OrbitRepository {
         return OrbitRepository(
             clientDao = clientDao,
@@ -56,7 +61,8 @@ object DatabaseModule {
             orderDao = orderDao,
             orderItemDao = orderItemDao,
             paymentDao = paymentDao,
-            installmentDao = installmentDao
+            installmentDao = installmentDao,
+            inventoryMovementDao = inventoryMovementDao
         )
     }
     

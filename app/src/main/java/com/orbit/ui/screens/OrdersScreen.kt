@@ -16,7 +16,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ViewModule
-import androidx.compose.material.icons.filled.ViewList
+import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,10 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import com.orbit.ui.theme.*
-import com.orbit.ui.components.ProfessionalButton
-import com.orbit.ui.components.ProfessionalCard
-import com.orbit.ui.components.ButtonVariant
-import com.orbit.ui.components.ButtonSize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,7 +41,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun OrdersScreen(
     onBackClick: () -> Unit = {},
     onOrderClick: (com.orbit.data.relation.OrderWithDetails) -> Unit = {},
-    onMapClick: () -> Unit = {},
     viewModel: OrdersViewModel = hiltViewModel()
 ) {
     val selectedFilter by viewModel.selectedFilter.collectAsState()
@@ -89,7 +84,7 @@ fun OrdersScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                 IconButton(onClick = { isGrid = !isGrid }) {
                     Icon(
-                        if (isGrid) Icons.Default.ViewList else Icons.Default.ViewModule,
+                        if (isGrid) Icons.AutoMirrored.Filled.ViewList else Icons.Default.ViewModule,
                         contentDescription = "Cambiar vista",
                         tint = TextSecondary,
                         modifier = Modifier.size(22.dp)
@@ -210,8 +205,7 @@ fun OrdersScreen(
                 items(orders) { orderWithDetails ->
                     OrderCard(
                         orderWithDetails = orderWithDetails,
-                        onClick = { onOrderClick(orderWithDetails) },
-                        onMapClick = onMapClick
+                        onClick = { onOrderClick(orderWithDetails) }
                     )
                 }
             }
@@ -227,8 +221,7 @@ fun OrdersScreen(
                 items(orders) { orderWithDetails ->
                     OrderCardCompact(
                         orderWithDetails = orderWithDetails,
-                        onClick = { onOrderClick(orderWithDetails) },
-                        onMapClick = onMapClick
+                        onClick = { onOrderClick(orderWithDetails) }
                     )
                 }
             }

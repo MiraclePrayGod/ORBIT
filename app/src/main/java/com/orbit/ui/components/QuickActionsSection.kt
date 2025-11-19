@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.orbit.ui.theme.HomeStrings
+import com.orbit.ui.theme.HomeColors
 
 @Composable
 fun QuickActionsSection(
@@ -27,7 +28,7 @@ fun QuickActionsSection(
         QuickActionButton(
             title = HomeStrings.Orders,
             icon = Icons.Filled.ShoppingCart,
-            iconColor = Color(0xFF2196F3),
+            iconColor = HomeColors.Blue,
             onClick = onOrdersClick,
             modifier = Modifier.weight(1f)
         )
@@ -35,7 +36,7 @@ fun QuickActionsSection(
         QuickActionButton(
             title = HomeStrings.Inventory,
             icon = Icons.Filled.Inventory,
-            iconColor = Color(0xFFFF9800),
+            iconColor = HomeColors.Orange,
             onClick = onInventoryClick,
             modifier = Modifier.weight(1f)
         )
@@ -43,7 +44,7 @@ fun QuickActionsSection(
         QuickActionButton(
             title = HomeStrings.Map,
             icon = Icons.Filled.LocationOn,
-            iconColor = Color(0xFF4CAF50),
+            iconColor = HomeColors.Green,
             onClick = onMapClick,
             modifier = Modifier.weight(1f)
         )
@@ -51,8 +52,8 @@ fun QuickActionsSection(
         QuickActionButton(
             title = HomeStrings.Reports,
             icon = Icons.Filled.BarChart,
-            iconColor = Color(0xFF9C27B0),
-            onClick = { },
+            iconColor = HomeColors.Purple,
+            onClick = { /* Reports functionality not implemented yet */ },
             modifier = Modifier.weight(1f)
         )
     }

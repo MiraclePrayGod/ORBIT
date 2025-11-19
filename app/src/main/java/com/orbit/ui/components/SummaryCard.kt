@@ -1,35 +1,25 @@
 package com.orbit.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.orbit.ui.theme.HomeColors
 import com.orbit.ui.theme.HomeDimens
-import com.orbit.ui.theme.cupertinoCardShadow
 
 @Composable
 fun SummaryCard(
@@ -37,26 +27,20 @@ fun SummaryCard(
     value: String,
     icon: ImageVector,
     iconColor: Color,
-    modifier: Modifier = Modifier,
-    isAmountVisible: Boolean = true,
-    onEyeClick: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .height(HomeDimens.SummaryHeight)
-            .cupertinoCardShadow(cornerRadius = HomeDimens.SummaryCorner)
-            .graphicsLayer {
-                shadowElevation = 0f
-                shape = RoundedCornerShape(HomeDimens.SummaryCorner)
-                clip = true
-            }
-            .border(
-                width = 0.5.dp,
-                color = Color(0x08000000),
-                shape = RoundedCornerShape(HomeDimens.SummaryCorner)
+            .shadow(
+                elevation = 7.dp,
+                shape = RoundedCornerShape(HomeDimens.SummaryCorner),
+                spotColor = Color(0xFF000000),
+                ambientColor = Color(0xFF000000)
             ),
         shape = RoundedCornerShape(HomeDimens.SummaryCorner),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier
@@ -89,33 +73,19 @@ fun SummaryCard(
                 Spacer(modifier = Modifier.width(HomeDimens.SummaryGap))
 
                 Text(
-                    text = if (isAmountVisible) value else "••••",
+                    text = value,
                     fontSize = HomeDimens.SummaryValueSize,
                     fontWeight = FontWeight.W600,
-                    color = Color(0xFF1D1D1F),
+                    color = HomeColors.TextPrimary,
                     letterSpacing = (-0.6).sp
                 )
-
-                Spacer(modifier = Modifier.width(HomeDimens.SummaryGap))
-
-                IconButton(
-                    onClick = onEyeClick,
-                    modifier = Modifier.size(16.dp)
-                ) {
-                    Icon(
-                        if (isAmountVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (isAmountVisible) "Ocultar" else "Mostrar",
-                        tint = Color(0xFF181717),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
             }
 
             Text(
                 text = title,
                 fontSize = HomeDimens.SummaryTitleSize,
                 fontWeight = FontWeight.W600,
-                color = Color(0xFF48484A),
+                color = HomeColors.TextSecondary,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 letterSpacing = (-0.2).sp

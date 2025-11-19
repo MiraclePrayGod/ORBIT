@@ -35,5 +35,8 @@ interface ClientDao {
     
     @Query("DELETE FROM clients WHERE id = :clientId")
     suspend fun deleteClientById(clientId: Long)
+    
+    @Query("SELECT COUNT(*) FROM clients")
+    suspend fun getClientCount(): Int
 }
 

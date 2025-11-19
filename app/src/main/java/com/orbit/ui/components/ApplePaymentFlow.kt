@@ -577,7 +577,7 @@ private fun ApplePaymentSummaryStepCompact(
             AppleSummaryRowCompact("Pago inicial", "$${String.format("%.2f", initialPayment)}", false, responsive)
             AppleSummaryRowCompact("Total cuotas", "$${String.format("%.2f", totalInstallments)}", false, responsive)
             
-            Divider(color = Color(0xFFE5E5EA))
+            HorizontalDivider(color = Color(0xFFE5E5EA))
             
             AppleSummaryRowCompact(
                 "Total pagos", 

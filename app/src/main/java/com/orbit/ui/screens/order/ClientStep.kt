@@ -3,7 +3,7 @@ package com.orbit.ui.screens.order
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Note
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
@@ -78,7 +78,7 @@ fun ClientStep(
                     value = clientReference,
                     onValueChange = onClientReferenceChange,
                     label = "Referencia",
-                    leadingIcon = Icons.Default.Note,
+                    leadingIcon = Icons.AutoMirrored.Filled.Note,
                     isRequired = false,
                     placeholder = "Referencia adicional (opcional)",
                     helperText = "Información adicional sobre el cliente"

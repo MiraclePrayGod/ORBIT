@@ -44,5 +44,15 @@ class Converters {
     fun toPaymentMethod(method: String): PaymentMethod {
         return PaymentMethod.valueOf(method)
     }
+    
+    @TypeConverter
+    fun fromMovementType(type: MovementType): String {
+        return type.name
+    }
+    
+    @TypeConverter
+    fun toMovementType(type: String): MovementType {
+        return MovementType.valueOf(type)
+    }
 }
 

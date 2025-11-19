@@ -49,5 +49,8 @@ interface ProductDao {
     
     @Query("UPDATE products SET status = :status, updatedAt = :timestamp WHERE id = :productId")
     suspend fun updateProductStatus(productId: Long, status: InventoryStatus, timestamp: Long = System.currentTimeMillis())
+    
+    @Query("SELECT COUNT(*) FROM products")
+    suspend fun getProductCount(): Int
 }
 

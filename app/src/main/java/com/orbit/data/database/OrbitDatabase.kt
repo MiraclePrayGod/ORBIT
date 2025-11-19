@@ -16,9 +16,10 @@ import com.orbit.data.dao.*
         OrderItem::class,
         Payment::class,
         Installment::class,
-        InstallmentPayment::class
+        InstallmentPayment::class,
+        InventoryMovement::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -30,6 +31,7 @@ abstract class OrbitDatabase : RoomDatabase() {
     abstract fun orderItemDao(): OrderItemDao
     abstract fun paymentDao(): PaymentDao
     abstract fun installmentDao(): InstallmentDao
+    abstract fun inventoryMovementDao(): InventoryMovementDao
     
     companion object {
         @Volatile

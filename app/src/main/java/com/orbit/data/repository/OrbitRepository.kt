@@ -8,6 +8,7 @@ import com.orbit.data.model.ValidationResult
 import com.orbit.data.model.OrderCreationResult
 import com.orbit.data.model.PaymentResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,7 +19,8 @@ class OrbitRepository @Inject constructor(
     private val orderDao: OrderDao,
     private val orderItemDao: OrderItemDao,
     private val paymentDao: PaymentDao,
-    private val installmentDao: InstallmentDao
+    private val installmentDao: InstallmentDao,
+    private val inventoryMovementDao: InventoryMovementDao
 ) {
     
     // Client operations
@@ -65,6 +67,34 @@ class OrbitRepository @Inject constructor(
     suspend fun updateProductStatus(productId: Long, status: InventoryStatus) = 
         productDao.updateProductStatus(productId, status)
     
+    // Inventory Movement operations
+    fun getMovementsByProduct(productId: Long): Flow<List<InventoryMovement>> = 
+        inventoryMovementDao.getMovementsByProduct(productId)
+    fun getRecentMovements(limit: Int = 50): Flow<List<InventoryMovement>> = 
+        inventoryMovementDao.getRecentMovements(limit)
+    fun getMovementsByType(type: MovementType): Flow<List<InventoryMovement>> = 
+        inventoryMovementDao.getMovementsByType(type)
+    fun getMovementsByDateRange(startDate: Long, endDate: Long): Flow<List<InventoryMovement>> = 
+        inventoryMovementDao.getMovementsByDateRange(startDate, endDate)
+    suspend fun insertInventoryMovement(
+        productId: Long,
+        movementType: MovementType,
+        quantity: Int,
+        previousQuantity: Int,
+        newQuantity: Int,
+        reason: String? = null
+    ): Long {
+        val movement = InventoryMovement(
+            productId = productId,
+            movementType = movementType,
+            quantity = quantity,
+            previousQuantity = previousQuantity,
+            newQuantity = newQuantity,
+            reason = reason
+        )
+        return inventoryMovementDao.insertMovement(movement)
+    }
+    
     // Order operations
     fun getAllOrdersWithDetails(): Flow<List<OrderWithDetails>> = orderDao.getAllOrdersWithDetails()
     suspend fun getOrderWithDetails(orderId: Long): OrderWithDetails? = orderDao.getOrderWithDetails(orderId)
@@ -75,6 +105,12 @@ class OrbitRepository @Inject constructor(
     fun getOrdersFromDate(date: Long): Flow<List<Order>> = orderDao.getOrdersFromDate(date)
     suspend fun getOrderCountFromDate(date: Long): Int = orderDao.getOrderCountFromDate(date)
     suspend fun getTotalSalesFromDate(date: Long): Double? = orderDao.getTotalSalesFromDate(date)
+    suspend fun getPendingOrdersCount(): Int {
+        return orderDao.getOrdersByStatus(OrderStatus.PENDING).first().size
+    }
+    suspend fun getLowStockProductsCount(threshold: Int = 10): Int {
+        return productDao.getLowStockProducts(threshold).first().size
+    }
     suspend fun insertOrder(order: Order): Long = orderDao.insertOrder(order)
     suspend fun updateOrder(order: Order) = orderDao.updateOrder(order)
     suspend fun deleteOrder(order: Order) = orderDao.deleteOrder(order)
@@ -285,21 +321,9 @@ class OrbitRepository @Inject constructor(
     
     // Database status methods for debugging
     suspend fun getDatabaseStatus(): String {
-        val clientCount = getAllClients().let { flow ->
-            var count = 0
-            flow.collect { count = it.size }
-            count
-        }
-        val productCount = getAllProducts().let { flow ->
-            var count = 0
-            flow.collect { count = it.size }
-            count
-        }
-        val orderCount = getAllOrdersWithDetails().let { flow ->
-            var count = 0
-            flow.collect { count = it.size }
-            count
-        }
+        val clientCount = clientDao.getClientCount()
+        val productCount = productDao.getProductCount()
+        val orderCount = orderDao.getOrderCount()
         
         return "Clientes: $clientCount, Productos: $productCount, Pedidos: $orderCount"
     }

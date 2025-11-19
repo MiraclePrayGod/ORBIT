@@ -30,12 +30,12 @@ fun RecentOrdersHeader(modifier: Modifier = Modifier) {
             text = HomeStrings.RecentOrdersTitle,
             fontSize = 20.sp,
             fontWeight = FontWeight.W600,
-            color = Color(0xFF1D1D1F)
+            color = HomeColors.TextPrimary
         )
 
         IconButton(
-            onClick = { },
-            modifier = Modifier.size(28.dp)
+            onClick = { /* Calendar filter functionality not implemented yet */ },
+            modifier = Modifier.size(48.dp)
         ) {
             Icon(
                 Icons.Filled.CalendarMonth,

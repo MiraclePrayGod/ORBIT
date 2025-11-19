@@ -16,9 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.orbit.data.entity.PaymentMethod
 import com.orbit.data.entity.Product
-import com.orbit.ui.components.ProfessionalButton
-import com.orbit.ui.components.ButtonVariant
-import com.orbit.ui.components.ButtonSize
 import com.orbit.ui.theme.*
 
 @Composable

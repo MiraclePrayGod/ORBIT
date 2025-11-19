@@ -5,10 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.orbit.ui.map.PanamaMapScreen
 import com.orbit.ui.screens.HomeScreen
 import com.orbit.ui.screens.OrdersScreen
 import com.orbit.ui.screens.InventoryScreen
+import com.orbit.ui.screens.InventoryVisualScreen
 import com.orbit.ui.screens.NewOrderScreen
 import com.orbit.ui.screens.OrderDetailScreen
 
@@ -28,11 +28,14 @@ fun AppNavigation(
                 onInventoryClick = {
                     navController.navigate("inventory")
                 },
+                onMapClick = {
+                    // Map functionality not implemented yet
+                },
                 onAddOrderClick = {
                     navController.navigate("new_order")
                 },
-                onMapClick = {
-                    navController.navigate("panama_map")
+                onOrderClick = { orderId ->
+                    navController.navigate("order_detail/$orderId")
                 }
             )
         }
@@ -44,15 +47,23 @@ fun AppNavigation(
                 },
                 onOrderClick = { orderWithDetails ->
                     navController.navigate("order_detail/${orderWithDetails.order.id}")
-                },
-                onMapClick = {
-                    navController.navigate("panama_map")
                 }
             )
         }
         
         composable("inventory") {
             InventoryScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onNewVisualClick = {
+                    navController.navigate("inventory_visual")
+                }
+            )
+        }
+        
+        composable("inventory_visual") {
+            InventoryVisualScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -76,10 +87,6 @@ fun AppNavigation(
                 }
             )
         }
-        composable("panama_map") {
-            PanamaMapScreen()
-        }
-
     }
 }
 

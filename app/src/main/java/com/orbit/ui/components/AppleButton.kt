@@ -198,7 +198,7 @@ fun AppleOutlinedButton(
             containerColor = Color.Transparent,
             contentColor = if (enabled) Color(0xFF007AFF) else Color(0xFF8E8E93)
         ),
-        border = ButtonDefaults.outlinedButtonBorder.copy(
+        border = ButtonDefaults.outlinedButtonBorder(enabled = enabled).copy(
             width = 1.dp,
             brush = if (enabled) 
                 SolidColor(Color(0xFF007AFF)) 

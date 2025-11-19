@@ -1,27 +1,19 @@
 package com.orbit.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,14 +25,12 @@ import java.util.Date
 import java.util.Locale
 import com.orbit.ui.theme.HomeColors
 import com.orbit.ui.theme.HomeStrings
-import com.orbit.ui.theme.cupertinoCardShadow
 
 @Composable
 fun OrderCard(
     orderWithDetails: OrderWithDetails,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    onMapClick: () -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
     val order = orderWithDetails.order
     val client = orderWithDetails.client
@@ -73,26 +63,20 @@ fun OrderCard(
         }
     }
     
-    // Unificar forma para sombra, clip y shape del Card
     val cardShape = RoundedCornerShape(22.dp)
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .cupertinoCardShadow(cornerRadius = 22.dp)
-            .graphicsLayer {
-                shadowElevation = 0f
-                shape = cardShape
-                clip = true
-            }
-            .border(
-                width = 0.5.dp,
-                color = Color(0x10000000),
-                shape = cardShape
-            )
-            .clip(cardShape),
+            .shadow(
+                elevation = 9.dp,
+                shape = cardShape,
+                spotColor = Color(0xFF000000),
+                ambientColor = Color(0xFF000000)
+            ),
         shape = cardShape,
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = HomeColors.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         onClick = onClick
     ) {
         Column(
@@ -132,23 +116,27 @@ fun OrderCard(
                         text = "Cliente: ${client.name}",
                         fontSize = bodyFontSize,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF3A3A3C),
+                        color = HomeColors.TextSecondary,
                         letterSpacing = (-0.3).sp
                     )
                     
                     Text(
-                        text = "Producto: Producto ${order.id}",
+                        text = if (orderWithDetails.orderItems.size == 1) {
+                            "1 producto"
+                        } else {
+                            "${orderWithDetails.orderItems.size} productos"
+                        },
                         fontSize = bodyFontSize,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF3A3A3C),
+                        color = HomeColors.TextSecondary,
                         letterSpacing = (-0.3).sp
                     )
                     
                     Text(
-                        text = "Cantidad: ${orderWithDetails.orderItems.size}",
+                        text = "Total items: ${orderWithDetails.orderItems.sumOf { it.quantity }}",
                         fontSize = bodyFontSize,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF3A3A3C),
+                        color = HomeColors.TextSecondary,
                         letterSpacing = (-0.3).sp
                     )
                 }
@@ -181,7 +169,7 @@ fun OrderCard(
                 }
             }
             
-            // Bottom: Date with calendar icon and map icon
+            // Bottom: Date with calendar icon
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -203,19 +191,6 @@ fun OrderCard(
                         fontWeight = FontWeight.Medium,
                         color = HomeColors.TextTertiary,
                         letterSpacing = (-0.2).sp
-                    )
-                }
-                
-                // Map icon
-                IconButton(
-                    onClick = onMapClick,
-                    modifier = Modifier.size(if (screenWidth < 360.dp) 28.dp else 32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Ver en mapa",
-                        tint = HomeColors.Blue,
-                        modifier = Modifier.size(if (screenWidth < 360.dp) 16.dp else 18.dp)
                     )
                 }
             }
@@ -303,8 +278,7 @@ private fun getStatusText(status: OrderStatus): String {
 @Composable
 fun OrderCardCompact(
     orderWithDetails: OrderWithDetails,
-    onClick: () -> Unit = {},
-    onMapClick: () -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
     val order = orderWithDetails.order
     val client = orderWithDetails.client
@@ -313,9 +287,15 @@ fun OrderCardCompact(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 136.dp)
-            .cupertinoCardShadow(cornerRadius = 16.dp),
+            .shadow(
+                elevation = 7.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = Color(0xFF000000),
+                ambientColor = Color(0xFF000000)
+            ),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = HomeColors.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         onClick = onClick
     ) {
         Column(
@@ -333,7 +313,7 @@ fun OrderCardCompact(
                     text = "$${String.format("%.2f", order.totalAmount)}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1C1C1E),
+                    color = HomeColors.TextPrimary,
                     letterSpacing = 0.3.sp
                 )
                 
@@ -348,7 +328,7 @@ fun OrderCardCompact(
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
+                        color = HomeColors.Background,
                         letterSpacing = 0.2.sp
                     )
                 }
@@ -361,7 +341,7 @@ fun OrderCardCompact(
                 text = "Pedido #${order.id}",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1C1C1E),
+                color = HomeColors.TextPrimary,
                 letterSpacing = 0.2.sp
             )
             
@@ -372,7 +352,7 @@ fun OrderCardCompact(
                 text = client.name,
                 fontSize = 11.5.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF3A3A3C),
+                color = HomeColors.TextSecondary,
                 letterSpacing = 0.1.sp,
                 maxLines = 2,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
@@ -385,14 +365,14 @@ fun OrderCardCompact(
                 Icon(
                     imageVector = Icons.Default.CalendarToday,
                     contentDescription = null,
-                    tint = Color(0xFF8E8E93),
+                    tint = HomeColors.TextTertiary,
                     modifier = Modifier.size(11.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = formatOrderDate(order.createdAt),
                     fontSize = 10.5.sp,
-                    color = Color(0xFF8E8E93)
+                    color = HomeColors.TextTertiary
                 )
             }
             
@@ -410,7 +390,7 @@ fun OrderCardCompact(
                     text = "Items: ${orderWithDetails.orderItems.size}",
                     fontSize = 10.5.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF3A3A3C)
+                    color = HomeColors.TextSecondary
                 )
                 
                 Row(
@@ -421,21 +401,8 @@ fun OrderCardCompact(
                         text = getPaymentMethodText(order.paymentMethod),
                         fontSize = 10.5.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF8E8E93)
+                        color = HomeColors.TextTertiary
                     )
-                    
-                    // Map icon compacto
-                    IconButton(
-                        onClick = onMapClick,
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Ver en mapa",
-                            tint = Color(0xFF0A84FF),
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
                 }
             }
         }

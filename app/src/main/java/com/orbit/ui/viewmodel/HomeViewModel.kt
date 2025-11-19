@@ -19,35 +19,51 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
     
+    private val _selectedDate = MutableStateFlow(LocalDate.now())
+    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
+    
     init {
+        loadHomeData()
+    }
+    
+    fun setSelectedDate(date: LocalDate) {
+        _selectedDate.value = date
         loadHomeData()
     }
     
     private fun loadHomeData() {
         viewModelScope.launch {
-            val today = LocalDate.now()
-            val startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            val endOfDay = today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val selectedDateValue = _selectedDate.value
+            val startOfDay = selectedDateValue.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+            val endOfDay = selectedDateValue.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
             
-            // Load today's orders count
-            val todayOrdersCount = repository.getOrderCountFromDate(startOfDay)
+            // Load selected date's orders count
+            val ordersCount = repository.getOrderCountFromDate(startOfDay)
             
-            // Load today's total sales
-            val todaySales = repository.getTotalSalesFromDate(startOfDay) ?: 0.0
+            // Load selected date's total sales
+            val sales = repository.getTotalSalesFromDate(startOfDay) ?: 0.0
             
-            // Load recent orders
+            // Load pending orders count
+            val pendingOrdersCount = repository.getPendingOrdersCount()
+            
+            // Load low stock products count
+            val lowStockCount = repository.getLowStockProductsCount(threshold = 10)
+            
+            // Load recent orders filtered by selected date (only need the first 3)
             repository.getAllOrdersWithDetails()
-                .combine(repository.getOrdersFromDate(startOfDay)) { allOrders, todayOrders ->
-                    val recentOrders = allOrders.take(3) // Show only 3 most recent
-                    HomeUiState(
-                        todayOrdersCount = todayOrdersCount,
-                        todaySales = todaySales,
+                .collect { allOrders ->
+                    val filteredOrders = allOrders.filter { order ->
+                        order.order.createdAt >= startOfDay && order.order.createdAt < endOfDay
+                    }
+                    val recentOrders = filteredOrders.take(3) // Show only 3 most recent
+                    _uiState.value = HomeUiState(
+                        todayOrdersCount = ordersCount,
+                        todaySales = sales,
+                        pendingOrdersCount = pendingOrdersCount,
+                        lowStockCount = lowStockCount,
                         recentOrders = recentOrders,
                         isLoading = false
                     )
-                }
-                .collect { state ->
-                    _uiState.value = state
                 }
         }
     }
@@ -61,6 +77,8 @@ class HomeViewModel @Inject constructor(
 data class HomeUiState(
     val todayOrdersCount: Int = 0,
     val todaySales: Double = 0.0,
+    val pendingOrdersCount: Int = 0,
+    val lowStockCount: Int = 0,
     val recentOrders: List<com.orbit.data.relation.OrderWithDetails> = emptyList(),
     val isLoading: Boolean = true
 )
